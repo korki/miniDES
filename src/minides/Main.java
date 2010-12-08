@@ -42,7 +42,7 @@ public class Main {
 	    System.out.println("Szyfrowanie tekstu do pliku - " + FILE_PLAIN);
 	    FileUtils.clearFile(FILE_CRYPT);
 	    FileUtils.writeFile(FILE_CRYPT, encrypt(FileUtils.readFile(FILE_PLAIN).get(0)), true);
-	} /*else if (optionFunction.equals("-d")) {
+	} else if (optionFunction.equals("-d")) {
 	    System.out.println("Kodowanie tekstu do pliku - " + FILE_CRYPT);
             getRotorsAndSets();
 	    clearFile(FILE_CRYPT);
@@ -56,7 +56,7 @@ public class Main {
 		getRotorsAndSets();
 		writeFile(FILE_CRYPT, encode(line) + "\n", true);
             }
-	}*/
+	}
     }
 
     public static String encrypt(String plain) {
