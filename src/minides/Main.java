@@ -52,13 +52,13 @@ public class Main {
 	String optionFunction = args[0];
 	KEY = FileUtils.readFile(FILE_KEY).get(0);
 	if (optionFunction.equals("-e")) {
-	    System.out.println("Szyfrowanie tekstu do pliku - " + FILE_PLAIN);	    
+	    System.out.println("Szyfrowanie tekstu do pliku - " + FILE_CRYPT);
 	    FileUtils.clearFile(FILE_CRYPT);
 	    FileUtils.writeFile(FILE_CRYPT, encrypt(FileUtils.readFile(FILE_PLAIN).get(0)), true);
 	} else if (optionFunction.equals("-d")) {
-	    System.out.println("Kodowanie tekstu do pliku - " + FILE_CRYPT);
+	    System.out.println("Rozszyfrowywanie tekstu do pliku - " + FILE_DECRYPT);
 	    FileUtils.clearFile(FILE_DECRYPT);
-	//    FileUtils.writeFile(FILE_DECRYPT, decrypt(FileUtils.readFile(FILE_PLAIN).get(0)), true);
+	    FileUtils.writeFile(FILE_DECRYPT, decrypt(FileUtils.readFile(FILE_CRYPT).get(0)), true);
 	} else if (optionFunction.equals("-a")) {
 	    System.out.println("Przygotowywanie analizy do pliku - " + FILE_ANALYZE);
 	    FileUtils.clearFile(FILE_ANALYZE);
@@ -96,8 +96,23 @@ public class Main {
 	return result.toString();
     }
 
-    public static String encrypt(String plain) {
+    public static String decrypt(String plain) {
 
+	String[] L = new String[9];
+	String[] R = new String[9];
+	L[0] = plain.substring(0, plain.length()/2);
+	R[0] = plain.substring(plain.length()/2, plain.length());
+
+	for (int i = 1; i <= 8; i++) {
+	    L[i] = R[i-1];
+	    R[i] = xorBits(L[i-1], fFunction(xorBits(eFunction(R[i-1]), rotKey(KEY, 8-(i-1)))));
+	}
+
+	return R[8]+L[8];
+    }
+
+    public static String encrypt(String plain) {
+	plain = plain.split(" ")[0];
 	String[] L = new String[9];
 	String[] R = new String[9];
 	L[0] = plain.substring(0, plain.length()/2);
@@ -108,52 +123,35 @@ public class Main {
 	    R[i] = xorBits(L[i-1], fFunction(xorBits(eFunction(R[i-1]), rotKey(KEY, i))));
 	}
 
-	
 	return R[8]+L[8];
     }
 
     private static String fFunction(String in) {
-	System.out.println(" -== fFunction");
-	System.out.println(" in: "+in);
-
 	int s1Index =  Integer.parseInt(in.substring(0, in.length()/2), 2);
 	int s2Index =  Integer.parseInt(in.substring(in.length()/2, in.length()), 2);
-
-	System.out.println(" out: "+S1[s1Index] + S2[s2Index]);
 	return S1[s1Index] + S2[s2Index];
     }
 
     private static String rotKey(String key, int i) {
-	System.out.println(" -== rotKey");
-	System.out.println(" in: "+key+", "+i);
 	StringBuilder result = new StringBuilder();
 	result.append(key.substring(i, key.length()));
 	result.append(key.substring(0, i));
-	System.out.println(" out: "+result.toString());
 	return result.toString();
     }
 
     private static String eFunction(String in) {
-	System.out.println(" -== eFunction");
-	System.out.println(" in: "+in);
 	StringBuilder result = new StringBuilder();
 	for (int i = 0; i < PERMROZ.length(); i++) {
-
-		    System.out.println(" in2: "+PERMROZ.substring(i, i+1));
 	    result.append(in.charAt(Integer.parseInt(PERMROZ.substring(i, i+1))-1));
 	}
-	System.out.println(" out: "+result.toString());
 	return result.toString();
     }
 
     private static String xorBits(String a, String b) {
-	System.out.println(" -== xorBits");
-	System.out.println(" in: "+a+", " +b);
 	StringBuilder result = new StringBuilder();
 	for (int i = 0; i < a.length(); i++) {
 	    result.append((int) a.charAt(i) ^ (int) b.charAt(i));
 	}
-	System.out.println(" out: "+result.toString());
 	return result.toString();
     }
 
